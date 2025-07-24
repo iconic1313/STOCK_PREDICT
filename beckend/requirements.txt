@@ -1,5 +1,7 @@
+flask
+flask-cors
+scikit-learn
+yfinance
 pandas
 numpy
-yfinance
-scikit-learn
 matplotlib
