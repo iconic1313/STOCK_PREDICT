@@ -24,11 +24,11 @@ export default function App() {
     setData(null);
     setLoading(true);
 
-    try {
-      // --- IMPORTANT CHANGE ---
-      // The line below now calls your actual Python backend server.
-      // Make sure your Python Flask/FastAPI server is running.
-      const response = await fetch(`http://127.0.0.1:5000/predict?ticker=${ticker}`);
+      try {
+        // --- IMPORTANT CHANGE ---
+        // The line below now calls your actual Python backend server.
+        // Make sure your Python Flask/FastAPI server is running.
+        const response = await fetch(`https://stock-predict-o06v.onrender.com/predict?ticker=${ticker}`);
 
       if (!response.ok) {
         // This will handle errors sent from your Python backend
