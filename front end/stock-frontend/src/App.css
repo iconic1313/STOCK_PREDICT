@@ -1,0 +1,212 @@
+
+/* --- Keyframes for Animations --- */
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Main Layout & Background --- */
+.app-container {
+  width: 100%;
+  min-height: 100vh;
+  color: #e2e8f0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+}
+
+.content-wrapper {
+  width: 100%;
+  max-width: 896px;
+  text-align: center;
+  margin-top: 4rem;
+}
+
+/* --- Typography --- */
+.main-title {
+  font-size: 3.75rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  background-image: linear-gradient(to right, #ec4899, #8b5cf6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.subtitle {
+  color: #94a3b8;
+  margin-bottom: 3rem;
+  font-size: 1.125rem;
+}
+
+/* --- Form & Input --- */
+.search-form {
+  position: relative;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  transform: translateY(-50%);
+  height: 1.25rem;
+  width: 1.25rem;
+  color: #64748b;
+}
+
+.search-input {
+  width: 100%;
+  padding: 1rem 7rem 1rem 3rem;
+  background-color: rgba(30, 41, 59, 0.5);
+  border: 1px solid #475569;
+  border-radius: 9999px;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #ec4899;
+}
+
+.search-button {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  transform: translateY(-50%);
+  background-color: #db2777;
+  color: white;
+  font-weight: 700;
+  padding: 0.5rem 1.25rem;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.search-button:hover {
+  background-color: #be185d;
+}
+
+.search-button:disabled {
+  background-color: #831843;
+  cursor: not-allowed;
+}
+
+/* --- Results, Loaders & Messages --- */
+.results-area {
+  margin-top: 2rem;
+  min-height: 150px;
+}
+
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #cbd5e1;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  border-radius: 50%;
+  height: 2rem;
+  width: 2rem;
+  border-bottom: 2px solid #ec4899;
+  margin-right: 0.75rem;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.error-message {
+  background-color: rgba(239, 68, 68, 0.2);
+  border: 1px solid #ef4444;
+  color: #fca5a5;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+}
+
+.placeholder {
+  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* --- Output Card --- */
+.output-card {
+  margin-top: 1.5rem;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.output-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.output-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 1rem;
+  color: #cbd5e1;
+  font-size: 1.125rem;
+}
+
+.prediction-row {
+  border-top: 1px solid #475569;
+  padding-top: 1rem;
+  margin-bottom: 0;
+}
+
+.price-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.trend-bullish {
+  color: #4ade80;
+}
+
+.trend-bearish {
+  color: #f87171;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 640px) {
+  .app-container {
+    padding: 1rem;
+  }
+  .content-wrapper {
+    margin-top: 2rem;
+  }
+  .main-title {
+    font-size: 2.25rem;
+  }
+}

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Market Predictor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Simple loader style */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #4f46e5;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+    <!-- Navigation Bar -->
+    <nav class="bg-gray-800 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex-shrink-0 flex items-center">
+                    <svg class="h-8 w-8 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                    <span class="ml-2 text-xl font-bold">StockPredict</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                    <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Predictions</a>
+                    <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">News</a>
+                    <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">About</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Search Section -->
+        <div class="bg-gray-800 p-6 rounded-lg shadow-xl mb-8">
+            <h2 class="text-2xl font-bold mb-4">Search for a US Stock</h2>
+            <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+                <input type="text" id="stock-ticker-input" placeholder="Enter Stock Ticker (e.g., AAPL, GOOGL)" class="flex-grow bg-gray-700 text-white placeholder-gray-400 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <button id="search-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-md transition duration-300 flex items-center justify-center">
+                    <span id="search-button-text">Search</span>
+                    <div id="search-loader" class="hidden loader w-6 h-6 border-2"></div>
+                </button>
+            </div>
+             <div id="error-message" class="text-red-400 mt-4 hidden"></div>
+        </div>
+
+        <!-- Stock Data Display -->
+        <div id="stock-data-container" class="hidden">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h1 id="company-name" class="text-4xl font-bold"></h1>
+                    <p id="company-ticker" class="text-gray-400 text-lg"></p>
+                </div>
+                <div>
+                    <p id="stock-price" class="text-5xl font-bold"></p>
+                    <p id="price-change" class="text-right text-2xl"></p>
+                </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="bg-gray-800 p-6 rounded-lg shadow-xl mb-8">
+                <h3 class="text-xl font-semibold mb-4">Historical Price Chart (Last 90 Days)</h3>
+                <canvas id="stockChart"></canvas>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Prediction -->
+                <div class="bg-gray-800 p-6 rounded-lg shadow-xl">
+                    <h3 class="text-xl font-semibold mb-4">Prediction for next trading day</h3>
+                    <div id="prediction-output" class="text-center">
+                        <p class="text-6xl font-bold mb-2" id="prediction-value"></p>
+                        <p class="text-2xl" id="prediction-confidence"></p>
+                    </div>
+                </div>
+
+                <!-- Key Metrics -->
+                <div class="bg-gray-800 p-6 rounded-lg shadow-xl">
+                    <h3 class="text-xl font-semibold mb-4">Key Metrics</h3>
+                    <div id="key-metrics" class="grid grid-cols-2 gap-4">
+                        <!-- Metrics will be injected here by JS -->
+                    </div>
+                </div>
+            </div>
+             <!-- News Section -->
+            <div class="bg-gray-800 p-6 rounded-lg shadow-xl mt-8">
+                <h3 class="text-xl font-semibold mb-4">Recent News</h3>
+                <div id="news-container" class="space-y-4">
+                    <!-- News articles will be injected here -->
+                </div>
+            </div>
+        </div>
+         <!-- Initial Message -->
+        <div id="initial-message" class="text-center py-16">
+            <svg class="mx-auto h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <h3 class="mt-2 text-sm font-semibold text-white">No stock selected</h3>
+            <p class="mt-1 text-sm text-gray-400">Search for a stock to see its data and prediction.</p>
+        </div>
+    </main>
+
+    <script>
+        const searchButton = document.getElementById('search-button');
+        const searchButtonText = document.getElementById('search-button-text');
+        const searchLoader = document.getElementById('search-loader');
+        const stockTickerInput = document.getElementById('stock-ticker-input');
+        const stockDataContainer = document.getElementById('stock-data-container');
+        const initialMessage = document.getElementById('initial-message');
+        const errorMessageDiv = document.getElementById('error-message');
+
+        let stockChart = null;
+
+        // *** THIS IS THE UPDATED FUNCTION ***
+        // It now calls your local Flask API.
+        async function fetchStockData(ticker) {
+            // The URL of your running Flask backend.
+            // 127.0.0.1 is your computer's local address.
+            const apiUrl = `http://127.0.0.1:8000/predict?ticker=${ticker}`;
+            
+            console.log(`Fetching data from: ${apiUrl}`);
+            
+            const response = await fetch(apiUrl);
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data;
+        }
+
+        function displayStockData(data) {
+             // Clear previous errors
+            errorMessageDiv.classList.add('hidden');
+            errorMessageDiv.textContent = '';
+
+            document.getElementById('company-name').textContent = data.companyName;
+            document.getElementById('company-ticker').textContent = data.ticker;
+            document.getElementById('stock-price').textContent = `$${data.price.toFixed(2)}`;
+            
+            const priceChangeEl = document.getElementById('price-change');
+            const changeText = `${data.change.toFixed(2)} (${data.changePercent.toFixed(2)}%)`;
+            if (data.change >= 0) {
+                priceChangeEl.textContent = `+${changeText}`;
+                priceChangeEl.classList.remove('text-red-500');
+                priceChangeEl.classList.add('text-green-500');
+            } else {
+                priceChangeEl.textContent = changeText;
+                priceChangeEl.classList.remove('text-green-500');
+                priceChangeEl.classList.add('text-red-500');
+            }
+
+            // Prediction
+            const predictionValueEl = document.getElementById('prediction-value');
+            predictionValueEl.textContent = `$${data.prediction.value.toFixed(2)}`;
+            if (data.prediction.trend === 'Up') {
+                predictionValueEl.classList.add('text-green-500');
+                predictionValueEl.classList.remove('text-red-500');
+            } else {
+                predictionValueEl.classList.add('text-red-500');
+                predictionValueEl.classList.remove('text-green-500');
+            }
+            document.getElementById('prediction-confidence').textContent = data.prediction.confidence;
+
+            // Key Metrics
+            const metricsContainer = document.getElementById('key-metrics');
+            metricsContainer.innerHTML = '';
+            for (const [key, value] of Object.entries(data.metrics)) {
+                 // Format market cap for better readability
+                let displayValue = value;
+                if (key === 'Market Cap' && typeof value === 'number') {
+                    displayValue = (value / 1e12).toFixed(2) + 'T';
+                } else if (typeof value === 'number') {
+                    displayValue = value.toFixed(2);
+                } else if (value === null || value === undefined) {
+                    displayValue = 'N/A';
+                }
+
+                const metricEl = document.createElement('div');
+                metricEl.innerHTML = `<p class="text-sm text-gray-400">${key}</p><p class="text-lg font-semibold">${displayValue}</p>`;
+                metricsContainer.appendChild(metricEl);
+            }
+            
+            // News
+            const newsContainer = document.getElementById('news-container');
+            newsContainer.innerHTML = '';
+            if (data.news && data.news.length > 0) {
+                data.news.forEach(article => {
+                    const articleEl = document.createElement('div');
+                    articleEl.className = 'border-b border-gray-700 pb-2';
+                    articleEl.innerHTML = `
+                        <h4 class="font-semibold">${article.title}</h4>
+                        <p class="text-sm text-gray-400">${article.source || 'N/A'}</p>
+                    `;
+                    newsContainer.appendChild(articleEl);
+                });
+            } else {
+                newsContainer.innerHTML = `<p class="text-gray-400">No recent news found.</p>`;
+            }
+
+
+            // Chart
+            const ctx = document.getElementById('stockChart').getContext('2d');
+            const labels = Array.from({length: data.historical.length}, (_, i) => `Day ${i + 1}`);
+            
+            if(stockChart) {
+                stockChart.destroy();
+            }
+
+            stockChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Price (USD)',
+                        data: data.historical,
+                        borderColor: 'rgba(79, 70, 229, 1)',
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                             grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        x: {
+                             grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            initialMessage.classList.add('hidden');
+            stockDataContainer.classList.remove('hidden');
+        }
+        
+        function showLoading(isLoading) {
+            if (isLoading) {
+                searchButton.disabled = true;
+                searchButtonText.classList.add('hidden');
+                searchLoader.classList.remove('hidden');
+            } else {
+                searchButton.disabled = false;
+                searchButtonText.classList.remove('hidden');
+                searchLoader.classList.add('hidden');
+            }
+        }
+        
+        function showError(message) {
+            errorMessageDiv.textContent = message;
+            errorMessageDiv.classList.remove('hidden');
+            stockDataContainer.classList.add('hidden');
+            initialMessage.classList.remove('hidden');
+        }
+
+        searchButton.addEventListener('click', async () => {
+            const ticker = stockTickerInput.value.trim();
+            if (!ticker) {
+                showError("Please enter a stock ticker.");
+                return;
+            }
+            
+            showLoading(true);
+            errorMessageDiv.classList.add('hidden');
+
+            try {
+                const data = await fetchStockData(ticker);
+                displayStockData(data);
+            } catch (error) {
+                console.error("Error fetching stock data:", error);
+                showError(error.message || "Failed to fetch data. Check the ticker or try again.");
+            } finally {
+                showLoading(false);
+            }
+        });
+        
+        stockTickerInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                searchButton.click();
+            }
+        });
+
+    </script>
+</body>
+</html>
